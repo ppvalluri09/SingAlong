@@ -55,7 +55,7 @@ fit.km <- kmeans(Num_Data_Norm, 5, nstart=25, iter.max = 30)
 
 train$Cluster <- fit.km$cluster
 
-rint("Size of clusters:")
+print("Size of clusters:")
 fit.km$size
 print("Centers:")
 fit.km$centers
@@ -72,25 +72,31 @@ fit.km$tot.withinss
 print("Between Clusters SS")
 fit.km$betweenss
 
+#Visualization
 clusplot(train, fit.km$cluster, color=TRUE, shade=TRUE, labels=5, lines=0)
 
-
-#Visualizing clusters in a magnificent way
+#Visualizing clusters together
 plot(datadf, col=train$Cluster)
 
 x<-c()
 for(i in 1:nrow(test)) {
-  dist <- sqrt(sum((test[i,]- fit.km$centers[1,])^2))
+  dist<-10000
+  for(j in 1:length(fit.km$size)) {
+    if(dist > sqrt(sum((test[i,]- fit.km$centers[j,])^2))){
+      dist<-sqrt(sum((test[i,]- fit.km$centers[j,])^2))
+    }
+  }
   x <- c(x,dist)
   print(x)
 }
 
+#recommending songs which have euclidean distance less than mean
 test<-cbind(test,x)
 m=mean(x)
-
+recommended<-c(1,1,1,1,1,1,1,1,1,1)
 for(i in 1:length(x)) {
   if (x[i]<m) {
-    recommended<-cbind(recommended,test[i,])
+    recommended<-rbind(recommended,test[i,])
   }
 }
 print(recommended)
